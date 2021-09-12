@@ -190,6 +190,27 @@ class TicTacToeEnv(gym.Env):
     def available_actions(self):
         return [i for i, c in enumerate(self.board) if c == 0]
 
+    @staticmethod
+    def invert_state(state):
+        """
+        Mirrors state as if other player was in that position.
+        Example: one X on board, O's move -> one O on board, X's move.
+        Args:
+            state: a state, result of self.reset() or self.step(action)[0]
+
+        Returns:
+            New state Tuple[Tuple[int], str]
+        """
+        # switch turn
+        player_turn = next_mark(state[1])
+
+        # invert board
+        INVERSION_CODE_MAP = {0: 0, 1: 2, 2: 1}
+        board = tuple([ INVERSION_CODE_MAP[c] for c in state[0] ])
+
+        return board, player_turn
+
+
 
 def set_log_level_by(verbosity):
     """Set log level by verbosity level.
