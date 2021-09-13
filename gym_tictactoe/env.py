@@ -124,20 +124,26 @@ class TicTacToeEnv(gym.Env):
             return self._get_obs(), 0, True, None
 
         reward = NO_REWARD
-        # place
-        self.board[loc] = tocode(self.mark)
-        status = check_game_status(self.board)
-        logging.debug("check_game_status board {} mark '{}'"
-                      " status {}".format(self.board, self.mark, status))
-        if status >= 0:
-            self.done = True
-            if status in [1, 2]:
-                # always called by self
-                reward = O_REWARD if self.mark == 'O' else X_REWARD
+        # check if valid action was given
+        if self.board[loc] == 0:
+            # place
+            self.board[loc] = tocode(self.mark)
+            status = check_game_status(self.board)
+            logging.debug("check_game_status board {} mark '{}'"
+                          " status {}".format(self.board, self.mark, status))
+            if status >= 0:
+                self.done = True
+                if status in [1, 2]:
+                    # always called by self
+                    reward = O_REWARD if self.mark == 'O' else X_REWARD
 
-        # switch turn
-        self.mark = next_mark(self.mark)
-        return self._get_obs(), reward, self.done, None
+            # switch turn
+            self.mark = next_mark(self.mark)
+            return self._get_obs(), reward, self.done, None
+        else:
+            # action attempts to overwrite space, this is illegal
+            # return same state, don't switch turn
+            return self._get_obs(), reward, self.done, None
 
     def _get_obs(self):
         return tuple(self.board), self.mark
